@@ -45,7 +45,7 @@ class Documentation
      */
     public function getIndex($version)
     {
-        return $this->cache->remember('docs.'.$version.'.index', 5, function () use ($version) {
+        $index = $this->cache->remember('docs.'.$version.'.index', 5, function () use ($version) {
             $path = base_path('resources/docs/'.$version.'/documentation.md');
 
             if ($this->files->exists($path)) {
@@ -54,6 +54,8 @@ class Documentation
 
             return null;
         });
+
+        return is_null($index) ? null : $this->setActiveLink($index);
     }
 
     /**
@@ -129,6 +131,23 @@ class Documentation
     public static function replaceLinks($version, $content)
     {
         return str_replace('%7B%7Bversion%7D%7D', $version, $content);
+    }
+
+    /**
+     * Set the active documentation link
+     * 
+     * @param string $content
+     * @return string
+     */
+    public static function setActiveLink($content)
+    {
+        $currentPath = '/'.request()->path();
+
+        if (substr_count($currentPath, '/') < 3) {
+            $currentPath = $currentPath . '/installation';
+        }
+
+        return str_replace("<li>\n<a href=\"$currentPath\">", "<li class=\"active\">\n<a href=\"$currentPath\">", $content);
     }
 
     /**

@@ -61,7 +61,8 @@
             }
         }
 
-        .sub--on {
+        .sub--on,
+        li:has(li.active) {
             &> h2 {
                 margin-bottom: 1em;
             }
